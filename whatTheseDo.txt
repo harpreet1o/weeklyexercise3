@@ -1,0 +1,190 @@
+1.
+a.
+let x = 1;
+
+const foo = () => {
+  x = 2;
+  return () => {
+    console.log(x);
+  };
+};
+
+foo()();
+console.log(x);
+
+answer- 
+2
+2
+The variable x is global scope so its value is changed in foo then foo is called which return the function and then that function is also called now it returns the value of which is 2 and then we again return value of x which is changed due to its globbal scope.
+
+
+b.
+var items = [1, 2, 3];
+var result = [];
+
+for (var i = 0; i < 3; i++) {
+  result.push(() => items[i]);
+}
+
+console.log(result.map((x) => x()));
+
+answer-
+[undefined,undefined,undefined]
+This is due to the fact that the var is functional scope so var i referring to 3 of item which is undefined and all the result functions are referring to 3 which is undefined so it is undefined when the function result is called with its functions
+
+c. What if we change the var i to let?
+
+answer-
+[1,2,3]
+ This changes everything now the let variable is block scope so now the each function has its own i and now it refrencing properly
+
+ d.
+var items = [1, 2, 3];
+var result = [];
+
+for (var i = 0; i < 3; i++) {
+  result.push(
+    (
+      (x) => () =>
+        items[x]
+    )(i)
+  );
+}
+
+console.log(result.map((x) => x()));
+
+answer-
+[1,2,3]
+This also makes it work because the function is now directly invoking and as a result the value of functions of result is resolved
+
+2.
+function rejectAfter2Seconds() {
+  console.log("starting slow promise");
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject("slow");
+    }, 2000);
+  });
+}
+
+function rejectAfter1Second() {
+  console.log("starting fast promise");
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject("fast");
+    }, 1000);
+  });
+}
+
+a.
+resolveAfter2Seconds();
+resolveAfter1Second();
+
+console.log(`done!`);
+
+answer-
+ starting slow promise
+ starting fast promise
+ done!
+ fast promise is done
+ slow promise is done
+
+The resolveAfter2Seconds function is run and the conosole value is printed and then it is waiting for promise to resolve for 2s and in the meantime it processes second function and wait for 1s and then  prints done now 1s function is resolved and finally the 2s is also resolved
+
+b.
+resolveAfter1Second();
+resolveAfter2Second2();
+
+console.log(`done!`);
+
+answer-
+starting fast promise
+uncaught error 
+fast promise is done
+
+The resolveAfter1second function is run and then the value is printed and then waiting for queue then we get the error because there is no function like that so it stops but after the 1s the value is resolved.
+
+d. 
+await resolveAfter2Seconds();
+resolveAfter1Second();
+
+console.log(`done!`);
+
+answer- 
+starting slow promise
+slow promise is done
+starting fast promise
+done!
+fast promise is done
+
+Here the await make it such that we wait till the function is fully executed and once done we move so now we start second but no await so we print done and then after 1s we print the other statement
+
+3. 
+function rejectAfter2Seconds() {
+  console.log("starting slow promise");
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject("slow");
+    }, 2000);
+  });
+}
+
+function rejectAfter1Second() {
+  console.log("starting fast promise");
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject("fast");
+    }, 1000);
+  });
+}
+a. 
+console.log("== starting ==");
+
+const slow = rejectAfter2Seconds();
+const fast = rejectAfter1Second();
+
+try {
+  console.log(await fast);
+} catch (e) {
+  console.log(`it broke! ${e}`);
+}
+
+try {
+  console.log(await slow);
+} catch (e) {
+  console.log(`it broke! ${e}`);
+}
+
+console.log("== done ==");
+
+anwswer-
+== starting ==
+starting slow promise
+starting fast promise
+it broke! fast
+it broke! slow
+== done ==
+
+The function fast is ran and till then the other function is also run and now the reject is catched in the catch and error is printed
+
+b. console.log("== starting ==");
+
+const slow = rejectAfter2Seconds();
+const fast = rejectAfter1Second();
+
+try {
+  console.log(await fast);
+  console.log(await slow);
+} catch (e) {
+  console.log(`it broke! ${e}`);
+}
+
+console.log("== done ==");
+
+answer-
+== starting ==
+starting slow promise
+starting fast promise
+it broke! fast
+== done ==
+Here only one try catch once the catch one error and then it exit try and catch
